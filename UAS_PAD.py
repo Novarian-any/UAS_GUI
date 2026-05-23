@@ -1,8 +1,11 @@
+# Import library GUI tkinter
 import tkinter as tk
+
+# ttk digunakan untuk tabel dan combobox
+# messagebox digunakan untuk popup pesan
 from tkinter import ttk, messagebox
 
-# ================= DATA PRODUK =================
-
+# Dictionary nama produk berdasarkan kode
 produk = {
     "001":"Indomie Goreng",
     "002":"Indomie Soto Lamongan",
@@ -23,6 +26,7 @@ produk = {
     "082":"Le Minerale 600ml"
 }
 
+# Dictionary harga produk
 harga = {
     "001":3500,
     "002":3500,
@@ -43,28 +47,32 @@ harga = {
     "082":3300
 }
 
-# ================= DATA =================
-
+# Menyimpan data barang yang dipilih user
 keranjang = {}
 
-# ================= FUNCTION =================
-
+# Menampilkan nama dan harga barang otomatis
 def tampilkan_info(event=None):
 
+    # Mengambil kode dari input
     kode = entry_kode.get()
 
+    # Jika kode ditemukan
     if kode in produk:
 
+        # Tampilkan nama barang
         label_barang.config(
             text=f"Nama Barang : {produk[kode]}"
         )
 
+        # Tampilkan harga barang
         label_harga.config(
             text=f"Harga : Rp{harga[kode]}"
         )
 
+    # Jika kode tidak ditemukan
     else:
 
+        # Reset label
         label_barang.config(
             text="Nama Barang : -"
         )
@@ -73,11 +81,13 @@ def tampilkan_info(event=None):
             text="Harga : -"
         )
 
-
+# Menambahkan barang ke keranjang
 def tambah_barang():
 
+    # Mengambil kode barang
     kode = entry_kode.get()
 
+    # Validasi kode barang
     if kode not in produk:
         messagebox.showerror(
             "Error",
@@ -85,6 +95,7 @@ def tambah_barang():
         )
         return
 
+    # Validasi jumlah barang
     try:
         jumlah = int(spin_jumlah.get())
 
@@ -95,31 +106,41 @@ def tambah_barang():
         )
         return
 
+    # Menambahkan barang ke keranjang
     keranjang[kode] = keranjang.get(kode, 0) + jumlah
 
+    # Refresh tabel keranjang
     tampilkan_keranjang()
 
+    # Menghapus input kode
     entry_kode.delete(0, tk.END)
 
+    # Reset jumlah barang
     spin_jumlah.delete(0, tk.END)
     spin_jumlah.insert(0, "1")
 
+    # Reset informasi barang
     label_barang.config(text="Nama Barang : -")
     label_harga.config(text="Harga : -")
 
-
+# Menampilkan isi keranjang ke tabel
 def tampilkan_keranjang():
 
+    # Menghapus isi tabel sebelumnya
     tree_keranjang.delete(*tree_keranjang.get_children())
 
     total = 0
 
+    # Loop isi keranjang
     for kode, jumlah in keranjang.items():
 
+        # Hitung subtotal
         subtotal = harga[kode] * jumlah
 
+        # Tambah ke total
         total += subtotal
 
+        # Tampilkan ke tabel
         tree_keranjang.insert(
             "",
             tk.END,
@@ -130,13 +151,15 @@ def tampilkan_keranjang():
             )
         )
 
+    # Tampilkan total belanja
     label_total.config(
         text=f"TOTAL : Rp{total}"
     )
 
-
+# Mengunci input sebelum pembayaran
 def selesai_input():
 
+    # Validasi keranjang kosong
     if len(keranjang) == 0:
         messagebox.showerror(
             "Error",
@@ -146,11 +169,13 @@ def selesai_input():
 
     total = 0
 
+    # Menghitung total harga
     for kode, jumlah in keranjang.items():
         total += harga[kode] * jumlah
 
     diskon = 0
 
+    # Menghitung diskon
     if total > 100000:
         diskon = total * 0.10
 
@@ -160,8 +185,10 @@ def selesai_input():
     elif total > 25000:
         diskon = total * 0.02
 
+    # Total setelah diskon
     total_bayar = int(total - diskon)
 
+    # Menampilkan informasi pembayaran
     messagebox.showinfo(
         "Input Selesai",
         f"Total Belanja : Rp{total}\n"
@@ -170,36 +197,46 @@ def selesai_input():
         f"Silahkan lanjut ke pembayaran"
     )
 
+    # Menonaktifkan input
     entry_kode.config(state="disabled")
     spin_jumlah.config(state="disabled")
     btn_tambah.config(state="disabled")
 
-
+# Mengembalikan program ke kondisi awal
 def transaksi_baru():
 
+    # Menghapus isi keranjang
     keranjang.clear()
 
+    # Refresh tabel
     tampilkan_keranjang()
 
+    # Mengaktifkan input kembali
     entry_kode.config(state="normal")
     spin_jumlah.config(state="normal")
     btn_tambah.config(state="normal")
 
+    # Menghapus isi input
     entry_kode.delete(0, tk.END)
 
+    # Reset jumlah barang
     spin_jumlah.delete(0, tk.END)
     spin_jumlah.insert(0, "1")
 
+    # Reset metode pembayaran
     metode_pembayaran.set("")
 
+    # Menghapus input uang
     entry_uang.delete(0, tk.END)
 
+    # Reset label barang
     label_barang.config(text="Nama Barang : -")
     label_harga.config(text="Harga : -")
 
-
+# Memproses pembayaran
 def bayar():
 
+    # Validasi keranjang kosong
     if len(keranjang) == 0:
         messagebox.showerror(
             "Error",
@@ -209,12 +246,13 @@ def bayar():
 
     total = 0
 
+    # Menghitung total harga
     for kode, jumlah in keranjang.items():
-
         total += harga[kode] * jumlah
 
     diskon = 0
 
+    # Menghitung diskon
     if total > 100000:
         diskon = total * 0.10
 
@@ -224,10 +262,13 @@ def bayar():
     elif total > 25000:
         diskon = total * 0.02
 
+    # Total akhir pembayaran
     total_bayar = int(total - diskon)
 
+    # Mengambil metode pembayaran
     metode = metode_pembayaran.get()
 
+    # Validasi metode pembayaran
     if metode == "":
         messagebox.showerror(
             "Error",
@@ -235,10 +276,13 @@ def bayar():
         )
         return
 
+    # Pembayaran cash
     if metode == "Cash":
 
+        # Mengambil input uang
         uang = entry_uang.get()
 
+        # Validasi input kosong
         if uang == "":
             messagebox.showerror(
                 "Error",
@@ -246,6 +290,7 @@ def bayar():
             )
             return
 
+        # Konversi ke integer
         try:
             uang = int(uang)
 
@@ -256,6 +301,7 @@ def bayar():
             )
             return
 
+        # Validasi uang kurang
         if uang < total_bayar:
             messagebox.showerror(
                 "Error",
@@ -263,8 +309,10 @@ def bayar():
             )
             return
 
+        # Hitung kembalian
         kembalian = uang - total_bayar
 
+        # Popup pembayaran berhasil
         messagebox.showinfo(
             "Pembayaran Berhasil",
             f"Metode : Cash\n"
@@ -273,8 +321,10 @@ def bayar():
             f"Kembalian : Rp{kembalian}"
         )
 
+        # Reset transaksi
         transaksi_baru()
 
+    # Pembayaran QRIS
     elif metode == "QRIS":
 
         messagebox.showinfo(
@@ -285,6 +335,7 @@ def bayar():
 
         transaksi_baru()
 
+    # Pembayaran Debit
     elif metode == "Debit":
 
         messagebox.showinfo(
@@ -295,18 +346,19 @@ def bayar():
 
         transaksi_baru()
 
-# ================= WINDOW =================
-
+# Membuat window utama
 root = tk.Tk()
 
+# Judul aplikasi
 root.title("APLIKASI KASIR")
 
+# Membuat fullscreen
 root.state("zoomed")
 
+# Background putih
 root.config(bg="white")
 
-# ================= TITLE =================
-
+# Label judul aplikasi
 judul = tk.Label(
     root,
     text="APLIKASI KASIR",
@@ -317,8 +369,7 @@ judul = tk.Label(
 
 judul.pack(pady=20)
 
-# ================= FRAME ATAS =================
-
+# Frame bagian atas
 frame_atas = tk.Frame(
     root,
     bg="white"
@@ -326,8 +377,7 @@ frame_atas = tk.Frame(
 
 frame_atas.pack(fill="x", pady=10)
 
-# ================= INPUT PRODUK =================
-
+# Frame input barang
 frame_input = tk.LabelFrame(
     frame_atas,
     text="INPUT PRODUK",
@@ -342,7 +392,7 @@ frame_input.pack(
     padx=20
 )
 
-# Kode Barang
+# Label kode barang
 tk.Label(
     frame_input,
     text="Kode Barang",
@@ -350,6 +400,7 @@ tk.Label(
     bg="white"
 ).grid(row=0, column=0, pady=10, sticky="w")
 
+# Input kode barang
 entry_kode = tk.Entry(
     frame_input,
     font=("Arial", 12),
@@ -358,253 +409,5 @@ entry_kode = tk.Entry(
 
 entry_kode.grid(row=0, column=1, padx=10)
 
+# Event keyboard
 entry_kode.bind("<KeyRelease>", tampilkan_info)
-
-# Jumlah Barang
-tk.Label(
-    frame_input,
-    text="Jumlah",
-    font=("Arial", 12),
-    bg="white"
-).grid(row=1, column=0, pady=10, sticky="w")
-
-spin_jumlah = tk.Spinbox(
-    frame_input,
-    from_=1,
-    to=100,
-    width=10,
-    font=("Arial", 12)
-)
-
-spin_jumlah.grid(row=1, column=1, sticky="w")
-
-# Nama Barang
-label_barang = tk.Label(
-    frame_input,
-    text="Nama Barang : -",
-    font=("Arial", 12, "bold"),
-    bg="white",
-    fg="green"
-)
-
-label_barang.grid(
-    row=2,
-    column=0,
-    columnspan=2,
-    pady=10
-)
-
-# Harga Barang
-label_harga = tk.Label(
-    frame_input,
-    text="Harga : -",
-    font=("Arial", 12),
-    bg="white"
-)
-
-label_harga.grid(
-    row=3,
-    column=0,
-    columnspan=2
-)
-
-# Tombol Tambah
-btn_tambah = tk.Button(
-    frame_input,
-    text="Tambah Produk",
-    font=("Arial", 12, "bold"),
-    bg="green",
-    fg="white",
-    width=20,
-    command=tambah_barang
-)
-
-btn_tambah.grid(
-    row=4,
-    column=0,
-    columnspan=2,
-    pady=10
-)
-
-# Tombol Selesai Input
-btn_selesai = tk.Button(
-    frame_input,
-    text="Selesai Input",
-    font=("Arial", 12, "bold"),
-    bg="orange",
-    fg="white",
-    width=20,
-    command=selesai_input
-)
-
-btn_selesai.grid(
-    row=5,
-    column=0,
-    columnspan=2,
-    pady=5
-)
-
-# ================= TABEL PRODUK =================
-
-frame_produk = tk.LabelFrame(
-    frame_atas,
-    text="DAFTAR PRODUK",
-    font=("Arial", 14, "bold"),
-    padx=10,
-    pady=10,
-    bg="white"
-)
-
-frame_produk.pack(
-    side="left",
-    padx=20
-)
-
-kolom_produk = ("Kode", "Nama Produk", "Harga")
-
-tree_produk = ttk.Treeview(
-    frame_produk,
-    columns=kolom_produk,
-    show="headings",
-    height=12
-)
-
-for col in kolom_produk:
-    tree_produk.heading(col, text=col)
-
-tree_produk.column("Kode", width=100)
-tree_produk.column("Nama Produk", width=350)
-tree_produk.column("Harga", width=150)
-
-for kode in produk:
-
-    tree_produk.insert(
-        "",
-        tk.END,
-        values=(
-            kode,
-            produk[kode],
-            f"Rp{harga[kode]}"
-        )
-    )
-
-tree_produk.pack()
-
-# ================= KERANJANG =================
-
-frame_bawah = tk.LabelFrame(
-    root,
-    text="KERANJANG BELANJA",
-    font=("Arial", 14, "bold"),
-    padx=20,
-    pady=20,
-    bg="white"
-)
-
-frame_bawah.pack(
-    fill="both",
-    expand=True,
-    padx=20,
-    pady=20
-)
-
-kolom_keranjang = (
-    "Nama Barang",
-    "Jumlah",
-    "Subtotal"
-)
-
-tree_keranjang = ttk.Treeview(
-    frame_bawah,
-    columns=kolom_keranjang,
-    show="headings",
-    height=12
-)
-
-for col in kolom_keranjang:
-    tree_keranjang.heading(col, text=col)
-
-tree_keranjang.column("Nama Barang", width=500)
-tree_keranjang.column("Jumlah", width=150)
-tree_keranjang.column("Subtotal", width=250)
-
-tree_keranjang.pack(
-    fill="both",
-    expand=True
-)
-
-# ================= TOTAL =================
-
-label_total = tk.Label(
-    root,
-    text="TOTAL : Rp0",
-    font=("Arial", 20, "bold"),
-    bg="white",
-    fg="blue"
-)
-
-label_total.pack(pady=10)
-
-# ================= METODE PEMBAYARAN =================
-
-frame_pembayaran = tk.LabelFrame(
-    root,
-    text="METODE PEMBAYARAN",
-    font=("Arial", 14, "bold"),
-    padx=20,
-    pady=20,
-    bg="white"
-)
-
-frame_pembayaran.pack(pady=10)
-
-# Combobox metode
-tk.Label(
-    frame_pembayaran,
-    text="Metode",
-    font=("Arial", 12),
-    bg="white"
-).grid(row=0, column=0, padx=10)
-
-metode_pembayaran = ttk.Combobox(
-    frame_pembayaran,
-    values=["Cash", "QRIS", "Debit"],
-    state="readonly",
-    width=20,
-    font=("Arial", 12)
-)
-
-metode_pembayaran.grid(row=0, column=1, padx=10)
-
-# Input uang cash
-tk.Label(
-    frame_pembayaran,
-    text="Uang Cash",
-    font=("Arial", 12),
-    bg="white"
-).grid(row=1, column=0, padx=10, pady=10)
-
-entry_uang = tk.Entry(
-    frame_pembayaran,
-    font=("Arial", 12),
-    width=23
-)
-
-entry_uang.grid(row=1, column=1)
-
-# ================= BUTTON BAYAR =================
-
-btn_bayar = tk.Button(
-    root,
-    text="BAYAR",
-    font=("Arial", 14, "bold"),
-    bg="blue",
-    fg="white",
-    width=25,
-    height=2,
-    command=bayar
-)
-
-btn_bayar.pack(pady=20)
-
-root.mainloop()
